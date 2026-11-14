@@ -1,0 +1,15 @@
+{
+  "name": "inventario-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema Web de Gestión de Inventarios (proyecto SENA)",
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "seed": "npm --prefix backend run seed",
+    "test": "npm --prefix backend test",
+    "build": "npm --prefix frontend run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
