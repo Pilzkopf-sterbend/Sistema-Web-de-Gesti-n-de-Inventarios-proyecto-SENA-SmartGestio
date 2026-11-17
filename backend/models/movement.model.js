@@ -33,6 +33,24 @@ const movementSchema = new mongoose.Schema(
     observacion: {
       type: String,
       trim: true
+    },
+    // Para qué sirve: Conservar la trazabilidad de las existencias antes y después.
+    stockAnterior: {
+      type: Number,
+      min: [0, 'El stock anterior no puede ser negativo']
+    },
+    stockPosterior: {
+      type: Number,
+      min: [0, 'El stock posterior no puede ser negativo']
+    },
+    // Para qué sirve: Evitar movimientos duplicados cuando el cliente reintenta un envío.
+    idempotencyKey: {
+      type: String,
+      unique: true,
+      sparse: true,
+      immutable: true,
+      trim: true,
+      maxlength: [120, 'La clave de idempotencia es demasiado larga']
     }
   },
   { timestamps: true }
@@ -48,7 +66,9 @@ movementSchema.methods.toSafeObject = function () {
     cantidad: this.cantidad,
     fecha: this.fecha,
     usuario: this.usuario,
-    observacion: this.observacion
+    observacion: this.observacion,
+    stockAnterior: this.stockAnterior,
+    stockPosterior: this.stockPosterior
   };
 };
 

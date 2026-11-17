@@ -1,6 +1,7 @@
 // Qué hace: Muestra la barra de navegación principal.
 // Para qué sirve: Permitir el acceso a las secciones y cerrar la sesión.
 
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
@@ -9,10 +10,24 @@ import { useAuth } from '../hooks/useAuth';
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Qué hace: Abre o cierra el menú en pantallas pequeñas.
+  // Para qué sirve: Permitir la navegación sin depender del JavaScript de Bootstrap.
+  function toggleMenu() {
+    setMenuOpen((open) => !open);
+  }
+
+  // Qué hace: Cierra el menú móvil.
+  // Para qué sirve: Liberar la pantalla después de elegir una opción.
+  function closeMenu() {
+    setMenuOpen(false);
+  }
 
   // Qué hace: Cierra la sesión y redirige al login.
   // Para qué sirve: Salir del sistema de forma segura.
   function handleLogout() {
+    closeMenu();
     logout();
     navigate('/login');
   }
@@ -20,46 +35,60 @@ export default function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
       <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
+        <Link className="navbar-brand" to="/" onClick={closeMenu}>
           Inventario
         </Link>
         <button
           className="navbar-toggler"
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded={menuOpen}
+          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          onClick={toggleMenu}
         >
           <span className="navbar-toggler-icon" />
         </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
+        <div
+          className={`collapse navbar-collapse${menuOpen ? ' show' : ''}`}
+          id="navbarNav"
+        >
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
-              <Link className="nav-link" to="/">
+              <Link className="nav-link" to="/" onClick={closeMenu}>
                 Dashboard
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/products">
+              <Link className="nav-link" to="/products" onClick={closeMenu}>
                 Productos
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/products?stock=low">
+              <Link className="nav-link" to="/scan" onClick={closeMenu}>
+                Escanear QR
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link
+                className="nav-link"
+                to="/products?stock=low"
+                onClick={closeMenu}
+              >
                 Stock bajo
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/movements">
+              <Link className="nav-link" to="/movements" onClick={closeMenu}>
                 Movimientos
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/categories">
+              <Link className="nav-link" to="/categories" onClick={closeMenu}>
                 Categorías
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/users">
+              <Link className="nav-link" to="/users" onClick={closeMenu}>
                 Usuarios
               </Link>
             </li>

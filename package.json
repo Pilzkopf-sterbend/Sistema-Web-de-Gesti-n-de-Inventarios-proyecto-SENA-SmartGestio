@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "concurrently -n backend,frontend -c blue,green \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
     "seed": "npm --prefix backend run seed",
+    "qr:backfill": "npm --prefix backend run backfill:qr",
     "test": "npm --prefix backend test",
     "build": "npm --prefix frontend run build"
   },

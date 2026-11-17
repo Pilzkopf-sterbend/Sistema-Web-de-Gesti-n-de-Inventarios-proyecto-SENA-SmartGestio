@@ -7,3 +7,45 @@ body {
 .mt-20 {
   margin-top: 2rem;
 }
+
+.qr-reader-wrap {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.qr-reader {
+  width: 100%;
+  min-height: 260px;
+}
+
+.qr-reader video {
+  width: 100% !important;
+  border-radius: 0.5rem;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .qr-print-area,
+  .qr-print-area * {
+    visibility: visible;
+  }
+
+  .qr-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border: 0 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  @page {
+    margin: 15mm;
+  }
+}

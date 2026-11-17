@@ -106,6 +106,7 @@ export default function ProductsPage({ stockLow = false }) {
       ) : products.length === 0 ? (
         <p className="text-muted">No hay productos para mostrar.</p>
       ) : (
+        <div className="table-responsive">
         <table className="table table-striped align-middle">
           <thead>
             <tr>
@@ -144,6 +145,12 @@ export default function ProductsPage({ stockLow = false }) {
                     >
                       Editar
                     </Link>
+                    <Link
+                      className="btn btn-sm btn-outline-secondary me-2"
+                      to={`/products/${product.id}/qr`}
+                    >
+                      QR
+                    </Link>
                     <button
                       className="btn btn-sm btn-outline-danger"
                       onClick={() => handleDelete(product)}
@@ -156,6 +163,7 @@ export default function ProductsPage({ stockLow = false }) {
             })}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

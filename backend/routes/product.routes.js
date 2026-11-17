@@ -19,6 +19,14 @@ router.get('/', asyncHandler(productController.list));
 // Para qué sirve: Registrar un nuevo artículo.
 router.post('/', asyncHandler(productController.create));
 
+// Qué hace: Consulta un producto activo por su token QR.
+// Para qué sirve: Resolver una etiqueta escaneada.
+router.get('/qr/:qrToken', asyncHandler(productController.getByQrToken));
+
+// Qué hace: Genera la imagen QR de un producto.
+// Para qué sirve: Mostrar, descargar o imprimir su etiqueta.
+router.get('/:id/qr', asyncHandler(productController.getQr));
+
 // Qué hace: Consulta un producto por su id.
 // Para qué sirve: Ver los datos de un artículo específico.
 router.get('/:id', asyncHandler(productController.getById));

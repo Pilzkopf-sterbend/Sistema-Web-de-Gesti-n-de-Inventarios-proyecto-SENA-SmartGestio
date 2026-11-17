@@ -6,7 +6,7 @@ Proyecto académico del programa **Técnico en Programación de Software** del *
 
 ## Alcance
 
-El sistema cubre autenticación, gestión de usuarios, categorías, productos, entradas y salidas de inventario, consulta de movimientos y un panel de control. Está diseñado para una instancia local y una sola organización, con un único rol `admin`.
+El sistema cubre autenticación, gestión de usuarios, categorías, productos, entradas y salidas de inventario, consulta de movimientos, etiquetas QR y un panel de control. Está diseñado para una instancia local y una sola organización, con un único rol `admin`.
 
 No incluye módulos de ventas, proveedores, facturación, contabilidad, nómina, aplicación móvil, analítica avanzada ni integraciones externas.
 
@@ -18,7 +18,8 @@ No incluye módulos de ventas, proveedores, facturación, contabilidad, nómina,
 | Usuarios | Listado, creación, edición y desactivación; email único; contraseña mínima de 6 caracteres; no permite desactivar la cuenta propia. |
 | Categorías | Listado, creación, edición y eliminación; nombre único; no permite eliminar categorías con productos activos asociados. |
 | Productos | Listado, búsqueda por nombre o código, filtro por categoría y por stock bajo; creación, edición y eliminación; código único; control de stock mínimo y unidad de medida. |
-| Movimientos | Registro de entradas y salidas; actualización automática del stock; validación de stock suficiente; historial con filtros por producto, tipo y rango de fechas. |
+| Movimientos | Registro de entradas y salidas; actualización automática del stock; validación de stock suficiente; historial con filtros por producto, tipo y rango de fechas; stock anterior y posterior; idempotencia por clave. |
+| Códigos QR | Token único e inmutable por producto; vista, descarga e impresión de etiqueta; escaneo con cámara, imagen o token manual; consulta de producto e historial. |
 | Panel de control | Indicadores de productos, unidades en stock, stock bajo, movimientos, categorías y usuarios activos; últimos 10 movimientos. |
 | Interfaz | Mensajes de éxito y error; navegación por módulos; validación de formularios en el cliente y en el servidor. |
 
@@ -34,14 +35,19 @@ No incluye módulos de ventas, proveedores, facturación, contabilidad, nómina,
 - Una categoría con productos activos no puede eliminarse.
 - El email de usuario, el nombre de categoría y el código de producto son únicos.
 - Un usuario no puede desactivar su propia cuenta.
+- Cada producto tiene un identificador QR opaco, único e inmutable; el QR no contiene datos comerciales.
+- Todo movimiento guarda el stock anterior y posterior.
+- Una clave de idempotencia repetida con los mismos datos no duplica el movimiento; con datos diferentes responde 409.
+- La cámara requiere HTTPS o `localhost`; si no está disponible se puede usar una imagen o el token manual.
 
 ## Stack tecnológico
 
 | Capa | Tecnologías |
 |---|---|
 | Frontend | React 18.3, React Router 6.26, Bootstrap 5.3 y Vite 6. |
-| Backend | Node.js, Express 4.19, Mongoose 8.5, bcryptjs, jsonwebtoken, dotenv y cors. |
+| Backend | Node.js, Express 4.19, Mongoose 8.5, bcryptjs, jsonwebtoken, dotenv, cors y qrcode 1.5. |
 | Base de datos | MongoDB. |
+| QR | `qrcode` en backend y `html5-qrcode` 2.3 en frontend. |
 | Pruebas | Jest 29.7 y Supertest 7.0 (backend). |
 
 ## Arquitectura
@@ -93,11 +99,11 @@ SENA-PROYECT/
 │   └── server.js        # Punto de entrada de la API
 ├── frontend/
 │   ├── src/
-│   │   ├── components/  # Layout, Navbar, AlertMessage, ProtectedRoute
+│   │   ├── components/  # Layout, Navbar, escáner y formulario QR
 │   │   ├── hooks/       # useAuth, useAlert
-│   │   ├── pages/       # Login, Dashboard, Productos, Movimientos, etc.
+│   │   ├── pages/       # Login, Dashboard, Productos, Movimientos, QR, etc.
 │   │   ├── services/    # Cliente HTTP y servicios por recurso
-│   │   ├── utils/       # Formato de fechas y moneda
+│   │   ├── utils/       # Formato de fechas, moneda e idempotencia
 │   │   ├── App.jsx      # Definición de rutas
 │   │   ├── main.jsx     # Punto de entrada de React
 │   │   └── index.css    # Estilos base
@@ -205,14 +211,24 @@ Credenciales del usuario demo:
 | Email | `admin@inventario.com` |
 | Contraseña | `admin123` |
 
+Los productos creados antes de la funcionalidad QR pueden recibir su token con:
+
+```bash
+npm run qr:backfill
+```
+
+El comando solo completa productos sin `qrToken`; no modifica stock ni movimientos.
+
 ## Uso básico
 
 1. Inicie MongoDB.
 2. Ejecute `npm run seed` si desea cargar los datos de demostración.
 3. Ejecute `npm run dev`.
 4. Abra `http://localhost:5173` e inicie sesión con las credenciales demo.
-5. Use el menú superior para acceder a Panel de control (Dashboard), Productos, Stock bajo, Movimientos, Categorías y Usuarios.
+5. Use el menú superior para acceder a Panel de control (Dashboard), Productos, Escanear QR, Stock bajo, Movimientos, Categorías y Usuarios.
 6. Para modificar el stock, registre un movimiento de entrada o salida. La edición de un producto no cambia la cantidad disponible.
+7. Para generar una etiqueta, abra **Productos → QR** y use **Descargar PNG** o **Imprimir etiqueta**.
+8. Para operar desde una etiqueta, abra **Escanear QR**, active la cámara y registre entradas o salidas desde la vista del producto.
 
 ## API REST
 
@@ -243,7 +259,9 @@ Authorization: Bearer <token>
 | GET | `/api/products/:id` | Consulta un producto por ID. |
 | PUT | `/api/products/:id` | Actualiza los datos del producto. No admite `cantidadDisponible`. |
 | DELETE | `/api/products/:id` | Elimina el producto o lo desactiva si tiene movimientos. |
-| POST | `/api/movements` | Registra una entrada o una salida. |
+| GET | `/api/products/:id/qr` | Devuelve el producto y su imagen QR en data URL. |
+| GET | `/api/products/qr/:qrToken` | Consulta un producto activo por su token QR. |
+| POST | `/api/movements` | Registra una entrada o una salida. Admite `idempotencyKey`. |
 | GET | `/api/movements` | Lista movimientos. Admite `producto`, `tipo`, `fechaInicio` y `fechaFin`. |
 | GET | `/api/dashboard/summary` | Devuelve los indicadores y los últimos movimientos. |
 
@@ -290,8 +308,8 @@ El contrato detallado de la API, incluidos los códigos de estado y los cuerpos 
 |---|---|---|
 | Usuario | `nombre`, `email` (único), `passwordHash`, `rol` (`admin`), `activo` | Referenciado por `Movimiento.usuario`. |
 | Categoría | `nombre` (único), `descripcion` | Referenciada por `Producto.categoria`. |
-| Producto | `codigo` (único), `nombre`, `descripcion`, `precio`, `cantidadDisponible`, `stockMinimo`, `unidadMedida`, `activo` | Pertenece a una categoría; referenciado por `Movimiento.producto`. |
-| Movimiento | `tipo` (`entrada`/`salida`), `cantidad`, `fecha`, `observacion` | Pertenece a un producto y a un usuario. |
+| Producto | `codigo` (único), `nombre`, `descripcion`, `precio`, `cantidadDisponible`, `stockMinimo`, `unidadMedida`, `imagen`, `qrToken` (único), `activo` | Pertenece a una categoría; referenciado por `Movimiento.producto`. |
+| Movimiento | `tipo` (`entrada`/`salida`), `cantidad`, `fecha`, `observacion`, `stockAnterior`, `stockPosterior`, `idempotencyKey` | Pertenece a un producto y a un usuario. |
 
 - Las relaciones se implementan mediante referencias de Mongoose (`ref`).
 - Las contraseñas se almacenan con hash bcrypt y no se devuelven en las respuestas de la API.
@@ -305,16 +323,17 @@ npm test
 
 Las pruebas usan Jest y Supertest sobre una instancia real de MongoDB. Por defecto se conectan a `mongodb://127.0.0.1:27017/inventario_test` y eliminan la base al finalizar. Para utilizar otra base, defina la variable `MONGODB_URI_TEST`.
 
-La suite actual contiene **47 pruebas en 6 suites** y cubre:
+La suite actual contiene **56 pruebas en 7 suites** y cubre:
 
 - Autenticación y protección de rutas.
 - Gestión de usuarios.
 - Gestión de categorías.
 - Gestión de productos, incluida la actualización sin modificar el stock.
 - Registro de entradas y salidas, validación de stock y consulta de movimientos.
+- Generación y consulta de QR, tokens únicos, imagen, seguridad e idempotencia.
 - Resumen del panel de control.
 
-No existen pruebas automatizadas de frontend; la interfaz se verifica manualmente.
+No existen pruebas automatizadas de frontend; la interfaz fue verificada manualmente el 2026-11-14, incluido el módulo QR.
 
 ## Compilación y ejecución en producción
 
@@ -339,5 +358,7 @@ El backend expone únicamente la API REST. El contenido de `frontend/dist/` debe
 - Las rutas protegidas verifican el token y que el usuario esté activo.
 - El token se almacena en `localStorage` en el navegador.
 - La configuración actual está pensada para desarrollo local: CORS está abierto y `JWT_SECRET` tiene un valor por defecto. En producción, defina un secreto seguro, restrinja CORS y utilice HTTPS.
+- El QR solo contiene un UUID opaco y su consulta exige JWT; el código impreso no autoriza movimientos por sí solo.
+- La cámara se activa con permiso del usuario y requiere HTTPS o `localhost`. Para pruebas móviles puede usarse un túnel HTTPS.
 
 

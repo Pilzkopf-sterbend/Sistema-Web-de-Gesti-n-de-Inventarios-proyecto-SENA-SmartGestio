@@ -1,6 +1,7 @@
 // Qué hace: Define el esquema de los productos.
 // Para qué sirve: Guardar los datos del inventario y validar el stock.
 
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema(
@@ -49,6 +50,19 @@ const productSchema = new mongoose.Schema(
       enum: ['unidades', 'kg', 'litros', 'metros'],
       default: 'unidades'
     },
+    // Para qué sirve: Mostrar una imagen opcional sin almacenar archivos en el servidor.
+    imagen: {
+      type: String,
+      trim: true
+    },
+    // Para qué sirve: Identificar el producto con un QR sin exponer datos comerciales.
+    qrToken: {
+      type: String,
+      unique: true,
+      sparse: true,
+      immutable: true,
+      default: () => crypto.randomUUID()
+    },
     // Para qué sirve: Permitir desactivar productos sin borrar su historial.
     activo: {
       type: Boolean,
@@ -71,6 +85,7 @@ productSchema.methods.toSafeObject = function () {
     cantidadDisponible: this.cantidadDisponible,
     stockMinimo: this.stockMinimo,
     unidadMedida: this.unidadMedida,
+    imagen: this.imagen,
     activo: this.activo
   };
 };

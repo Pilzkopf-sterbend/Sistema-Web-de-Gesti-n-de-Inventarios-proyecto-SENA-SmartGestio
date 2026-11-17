@@ -122,6 +122,7 @@ export default function MovementsPage() {
       ) : movements.length === 0 ? (
         <p className="text-muted">No hay movimientos para los filtros seleccionados.</p>
       ) : (
+        <div className="table-responsive">
         <table className="table table-striped align-middle">
           <thead>
             <tr>
@@ -152,6 +153,7 @@ export default function MovementsPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

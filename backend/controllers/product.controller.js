@@ -2,6 +2,7 @@
 // Para qué sirve: Conectar las rutas con el servicio de inventario.
 
 const productService = require('../services/product.service');
+const qrService = require('../services/qr.service');
 
 // Qué hace: Lista los productos con los filtros de la URL.
 // Para qué sirve: Permitir búsquedas por texto, categoría o stock bajo.
@@ -20,6 +21,20 @@ async function list(req, res) {
 async function getById(req, res) {
   const product = await productService.getProductById(req.params.id);
   res.json({ product });
+}
+
+// Qué hace: Busca un producto activo por su token QR.
+// Para qué sirve: Mostrar el producto después de escanear una etiqueta.
+async function getByQrToken(req, res) {
+  const product = await qrService.getProductByQrToken(req.params.qrToken);
+  res.json({ product });
+}
+
+// Qué hace: Genera la imagen QR de un producto.
+// Para qué sirve: Visualizar, descargar o imprimir la etiqueta.
+async function getQr(req, res) {
+  const result = await qrService.getProductQr(req.params.id);
+  res.json(result);
 }
 
 // Qué hace: Crea un producto con los datos recibidos.
@@ -43,4 +58,4 @@ async function remove(req, res) {
   res.json(result);
 }
 
-module.exports = { list, getById, create, update, remove };
+module.exports = { list, getById, getByQrToken, getQr, create, update, remove };

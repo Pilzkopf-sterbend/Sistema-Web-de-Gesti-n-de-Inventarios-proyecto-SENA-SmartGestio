@@ -147,6 +147,7 @@ export default function UsersPage() {
       {loading ? (
         <p>Cargando...</p>
       ) : (
+        <div className="table-responsive">
         <table className="table table-striped align-middle">
           <thead>
             <tr>
@@ -189,6 +190,7 @@ export default function UsersPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

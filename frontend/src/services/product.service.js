@@ -23,6 +23,19 @@ export async function getProduct(id) {
   return data.product;
 }
 
+// Qué hace: Obtiene un producto activo por su token QR.
+// Para qué sirve: Mostrar el producto después de escanear una etiqueta.
+export async function getProductByQrToken(qrToken) {
+  const data = await http.get(`/products/qr/${encodeURIComponent(qrToken)}`);
+  return data.product;
+}
+
+// Qué hace: Obtiene el producto y su imagen QR.
+// Para qué sirve: Visualizar, descargar o imprimir la etiqueta.
+export async function getProductQr(id) {
+  return http.get(`/products/${id}/qr`);
+}
+
 // Qué hace: Crea un producto.
 // Para qué sirve: Registrar un nuevo artículo en el inventario.
 export async function createProduct(product) {

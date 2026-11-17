@@ -129,6 +129,7 @@ export default function CategoriesPage() {
       {loading ? (
         <p>Cargando...</p>
       ) : (
+        <div className="table-responsive">
         <table className="table table-striped align-middle">
           <thead>
             <tr>
@@ -160,6 +161,7 @@ export default function CategoriesPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

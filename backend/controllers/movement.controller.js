@@ -12,9 +12,12 @@ async function create(req, res) {
     cantidad: req.body.cantidad,
     // Para qué sirve: Asociar el movimiento al usuario que inició sesión.
     usuario: req.user.id,
-    observacion: req.body.observacion
+    observacion: req.body.observacion,
+    // Para qué sirve: Evitar duplicados cuando el frontend reintenta un envío.
+    idempotencyKey: req.body.idempotencyKey
   });
-  res.status(201).json(result);
+  // Para qué sirve: Distinguir una creación nueva de un reintento idempotente.
+  res.status(result.duplicate ? 200 : 201).json(result);
 }
 
 // Qué hace: Lista los movimientos con los filtros de la URL.

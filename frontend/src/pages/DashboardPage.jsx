@@ -63,6 +63,7 @@ export default function DashboardPage() {
 
       <h3 className="h5 mb-3">Últimos movimientos</h3>
       {/* Para qué sirve: Mostrar el historial reciente de entradas y salidas. */}
+      <div className="table-responsive">
       <table className="table table-striped align-middle">
         <thead>
           <tr>
@@ -97,6 +98,7 @@ export default function DashboardPage() {
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

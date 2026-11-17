@@ -33,8 +33,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card shadow-sm" style={{ width: '380px' }}>
+    <div className="d-flex justify-content-center align-items-center vh-100 bg-light px-3">
+      <div className="card shadow-sm w-100" style={{ maxWidth: '380px' }}>
         <div className="card-body p-4">
           <h1 className="h4 text-center mb-4">Sistema de Gestión de Inventarios</h1>
           {error && <div className="alert alert-danger py-2">{error}</div>}

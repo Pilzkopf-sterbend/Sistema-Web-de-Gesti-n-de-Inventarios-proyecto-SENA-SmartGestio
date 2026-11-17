@@ -18,7 +18,8 @@ const emptyForm = {
   precio: '',
   cantidadDisponible: 0,
   stockMinimo: 0,
-  unidadMedida: 'unidades'
+  unidadMedida: 'unidades',
+  imagen: ''
 };
 
 // Qué hace: Carga las categorías y el producto cuando se está editando.
@@ -51,7 +52,8 @@ export default function ProductFormPage() {
             precio: product.precio ?? '',
             cantidadDisponible: product.cantidadDisponible,
             stockMinimo: product.stockMinimo,
-            unidadMedida: product.unidadMedida
+            unidadMedida: product.unidadMedida,
+            imagen: product.imagen || ''
           });
         })
         .catch((err) => show({ type: 'error', text: err.message }))
@@ -75,7 +77,8 @@ export default function ProductFormPage() {
       categoria: form.categoria,
       precio: form.precio === '' ? undefined : Number(form.precio),
       stockMinimo: Number(form.stockMinimo),
-      unidadMedida: form.unidadMedida
+      unidadMedida: form.unidadMedida,
+      imagen: form.imagen.trim()
     };
     // Para qué sirve: Enviar el stock inicial solo al crear el producto.
     if (!isEditing) {
@@ -136,6 +139,19 @@ export default function ProductFormPage() {
               value={form.descripcion}
               onChange={handleChange}
             />
+          </div>
+          <div className="col-12">
+            <label className="form-label">URL de imagen (opcional)</label>
+            <input
+              name="imagen"
+              className="form-control"
+              value={form.imagen}
+              onChange={handleChange}
+              placeholder="https://ejemplo.com/producto.jpg"
+            />
+            <small className="text-muted">
+              Acepta una URL http(s) o una data URL de imagen.
+            </small>
           </div>
           <div className="col-md-6">
             <label className="form-label">Categoría</label>

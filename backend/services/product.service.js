@@ -13,6 +13,36 @@ function escapeRegExp(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// Qué hace: Valida la URL o data URL de la imagen del producto.
+// Para qué sirve: Evitar guardar valores que no puedan mostrarse como imagen.
+function validateImagen(imagen) {
+  if (imagen === undefined) {
+    return undefined;
+  }
+  if (imagen === null || imagen === '') {
+    return '';
+  }
+  if (typeof imagen !== 'string') {
+    throw new ApiError(400, 'La imagen debe ser una URL válida');
+  }
+
+  const value = imagen.trim();
+  if (!value) {
+    return '';
+  }
+
+  const isUrl = /^https?:\/\/\S+$/i.test(value);
+  const isDataImage = /^data:image\/[a-z0-9.+-]+;base64,\S+$/i.test(value);
+  if (!isUrl && !isDataImage) {
+    throw new ApiError(
+      400,
+      'La imagen debe ser una URL http(s) o una data URL de imagen'
+    );
+  }
+
+  return value;
+}
+
 // Qué hace: Lista los productos activos con filtros opcionales.
 // Para qué sirve: Permitir búsquedas por texto, categoría o stock bajo.
 async function listProducts({ search, categoria, stockLow } = {}) {
@@ -68,7 +98,11 @@ async function validateCategory(categoria) {
 // Para qué sirve: Registrar nuevos artículos en el inventario.
 async function createProduct(data) {
   await validateCategory(data.categoria);
-  const product = new Product(data);
+  const productData = { ...data };
+  if (data.imagen !== undefined) {
+    productData.imagen = validateImagen(data.imagen);
+  }
+  const product = new Product(productData);
   await product.save();
   return product.toSafeObject();
 }
@@ -102,6 +136,9 @@ async function updateProduct(id, data) {
   }
   if (data.unidadMedida !== undefined) {
     product.unidadMedida = data.unidadMedida;
+  }
+  if (data.imagen !== undefined) {
+    product.imagen = validateImagen(data.imagen);
   }
   // Para qué sirve: Garantizar que el stock solo cambie mediante movimientos.
   if (data.cantidadDisponible !== undefined) {

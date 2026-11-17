@@ -15,6 +15,9 @@ import MovementsPage from './pages/MovementsPage';
 import MovementFormPage from './pages/MovementFormPage';
 import CategoriesPage from './pages/CategoriesPage';
 import UsersPage from './pages/UsersPage';
+import QrScanPage from './pages/QrScanPage';
+import QrProductPage from './pages/QrProductPage';
+import ProductQrPage from './pages/ProductQrPage';
 
 // Qué hace: Agrupa las rutas públicas y protegidas.
 // Para qué sirve: Controlar qué páginas requieren iniciar sesión.
@@ -39,6 +42,9 @@ function App() {
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/products/new" element={<ProductFormPage />} />
               <Route path="/products/:id/edit" element={<ProductFormPage />} />
+              <Route path="/products/:id/qr" element={<ProductQrPage />} />
+              <Route path="/scan" element={<QrScanPage />} />
+              <Route path="/scan/:token" element={<QrProductPage />} />
               <Route path="/movements" element={<MovementsPage />} />
               <Route path="/movements/new" element={<MovementFormPage />} />
               <Route path="/categories" element={<CategoriesPage />} />
