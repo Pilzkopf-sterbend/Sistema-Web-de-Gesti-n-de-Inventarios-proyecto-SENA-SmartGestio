@@ -359,6 +359,6 @@ El backend expone únicamente la API REST. El contenido de `frontend/dist/` debe
 - El token se almacena en `localStorage` en el navegador.
 - La configuración actual está pensada para desarrollo local: CORS está abierto y `JWT_SECRET` tiene un valor por defecto. En producción, defina un secreto seguro, restrinja CORS y utilice HTTPS.
 - El QR solo contiene un UUID opaco y su consulta exige JWT; el código impreso no autoriza movimientos por sí solo.
-- La cámara se activa con permiso del usuario y requiere HTTPS o `localhost`. Para pruebas móviles puede usarse un túnel HTTPS.
+- La cámara se activa con permiso del usuario y requiere HTTPS o `localhost`. Para pruebas móviles puede usarse un tunel HTTPS.
 
 

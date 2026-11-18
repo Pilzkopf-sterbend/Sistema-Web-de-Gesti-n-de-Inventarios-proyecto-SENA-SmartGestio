@@ -10,7 +10,7 @@ export default function AlertMessage() {
   if (!message) {
     return null;
   }
-  // Para qué sirve: Usar color verde para éxito y rojo para errores.
+  // Para qué sirve: Usar color verde para éxito y rojo para errores
   const variant = message.type === 'success' ? 'success' : 'danger';
   return (
     <div className={`alert alert-${variant} alert-dismissible`} role="alert">

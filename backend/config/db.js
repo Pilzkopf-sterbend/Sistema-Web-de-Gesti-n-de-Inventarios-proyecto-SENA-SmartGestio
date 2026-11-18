@@ -11,7 +11,7 @@ async function connectDB() {
   console.log('Conectado a MongoDB');
 }
 
-// Qué hace: Cierra la conexión con MongoDB.
+// Qué hace: Cierra la conexion con MongoDB.
 // Para qué sirve: Liberar recursos al terminar procesos o pruebas.
 async function disconnectDB() {
   await mongoose.disconnect();
